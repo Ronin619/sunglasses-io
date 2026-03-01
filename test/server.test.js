@@ -12,6 +12,7 @@ describe("Brands", () => {
         .request(server)
         .get("/api/brands")
         .end((err, res) => {
+          if (err) return done(err);
           res.should.have.status(200);
           res.body.should.be.an("array");
           res.body.forEach((item) => {
@@ -21,6 +22,24 @@ describe("Brands", () => {
           });
           done();
         });
+    });
+
+    describe("/Get brands/:id/products", () => {
+      it("it should get all products by brand id", (done) => {
+        chai
+          .request(server)
+          .get("/api/brands/1/products")
+          .end((err, res) => {
+            if (err) return done(err);
+            res.should.have.status(200);
+            res.body.should.be.an("array");
+            res.body.forEach((product) => {
+              product.should.be.an("object");
+              product.categoryId.should.eql("1");
+            });
+            done();
+          });
+      });
     });
   });
 });
