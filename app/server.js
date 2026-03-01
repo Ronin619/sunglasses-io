@@ -49,6 +49,16 @@ app.get("/api/brands/:id/products", function (request, response) {
   return response.end(JSON.stringify(filteredProducts));
 });
 
+app.get("/api/products", function (request, response) {
+  if (products.length === 0) {
+    response.writeHead(404, { "Content-Type": "application/json" });
+    return response.end(JSON.stringify({ message: "No products available." }));
+  }
+
+  response.writeHead(200, { "Content-Type": "application/json" });
+  return response.end(JSON.stringify(products));
+});
+
 // Starting the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
