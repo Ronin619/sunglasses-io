@@ -42,6 +42,28 @@ describe("Brands", () => {
       });
     });
   });
+
+  describe("/GET products", () => {
+    it("it should get all available products", (done) => {
+      chai
+        .request(server)
+        .get("/api/products")
+        .end((err, res) => {
+          if (err) return done(err);
+          res.should.have.status(200);
+          res.body.should.be.an("array");
+          res.body.forEach((item) => {
+            item.should.be.an("object");
+            item.should.have.property("id");
+            item.should.have.property("categoryId");
+            item.should.have.property("name");
+            item.should.have.property("price");
+            item.should.have.property("imageUrls");
+          });
+          done();
+        });
+    });
+  });
 });
 
 describe("Login", () => {});
