@@ -3,18 +3,23 @@ info:
   version: "1.0.0"
   title: "E-Commerce API"
   description: "API for managing brands, products, and user cart"
+
 host: "localhost:3000"
 schemes:
   - "http"
+
 basePath: "/api"
+
 produces:
   - "application/json"
+
 paths:
-  /api/brands:
+  /brands:
     get:
       summary: Brands
-      description: |
-        The brands endpoint returns all brands of sunglasses. The response will include the id and name of each sunglass brand.
+      description: >
+        The brands endpoint returns all brands of sunglasses.
+        The response will include the id and name of each sunglass brand.
       tags:
         - brands
       responses:
@@ -24,36 +29,42 @@ paths:
             type: array
             items:
               type: object
+              required:
+                - id
+                - name
               properties:
                 id:
                   type: string
                 name:
                   type: string
-              required:
-                - id
-                - name
-    /api/brands/{id}/products:
-      get:
-        summary: Products
-        description: |
-          The products by brand id endpoint returns all products that match the brand id parameter.
-        parameters:
-          - id: id
-            in: path
-            description: The id of the brand to accept
-            requried: true
-            type: string
-        tags:
-          - products
-        responses:
-          404:
-            description: No products with matching brand id exists.
-          200:
-            description: An array of products
-            scheme:
-              type: array
+
+  /brands/{id}/products:
+    get:
+      summary: Products
+      description: >
+        The products by brand id endpoint returns all products
+        that match the brand id parameter.
+      tags:
+        - products
+      parameters:
+        - name: id
+          in: path
+          description: The id of the brand to accept
+          required: true
+          type: string
+      responses:
+        200:
+          description: An array of products
+          schema:
+            type: array
             items:
               type: object
+              required:
+                - id
+                - categoryId
+                - name
+                - price
+                - imageUrls
               properties:
                 id:
                   type: string
@@ -69,9 +80,5 @@ paths:
                   type: array
                   items:
                     type: string
-                required:
-                  - id
-                  - categoryId
-                  - name
-                  - price
-                  - imageUrls
+        404:
+          description: No products with matching brand id exist.
