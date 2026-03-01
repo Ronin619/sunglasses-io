@@ -32,3 +32,46 @@ paths:
               required:
                 - id
                 - name
+    /api/brands/{id}/products:
+      get:
+        summary: Products
+        description: |
+          The products by brand id endpoint returns all products that match the brand id parameter.
+        parameters:
+          - id: id
+            in: path
+            description: The id of the brand to accept
+            requried: true
+            type: string
+        tags:
+          - products
+        responses:
+          404:
+            description: No products with matching brand id exists.
+          200:
+            description: An array of products
+            scheme:
+              type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                categoryId:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: string
+                imageUrls:
+                  type: array
+                  items:
+                    type: string
+                required:
+                  - id
+                  - categoryId
+                  - name
+                  - price
+                  - imageUrls
