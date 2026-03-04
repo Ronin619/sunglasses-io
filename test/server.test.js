@@ -66,7 +66,7 @@ describe("Brands", () => {
   });
 });
 
-describe("Login", () => {
+describe("/POST Login", () => {
   it("it should 200 for valid credentials", (done) => {
     chai
       .request(server)

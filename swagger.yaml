@@ -114,3 +114,33 @@ paths:
                     type: string
         404:
           description: No products available.
+  /login:
+    post:
+      summary: login
+      description: >
+        The login endpoint checks if user credentials exist in the user database and generates a jwt web token.
+      tags:
+        - login
+      parameters:
+        - name: username
+          in: query
+          description: The username
+          required: true
+          type: string
+        - name: password
+          in: query
+          description: user password
+          required: true
+          type: string
+      response:
+        200:
+          description: >
+            If a user credential is verified, a jwt web token is returned to the client.
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+        401:
+          description: >
+            If the user credentials cannot be verified, return a 401 error.
