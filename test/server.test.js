@@ -66,6 +66,29 @@ describe("Brands", () => {
   });
 });
 
-describe("Login", () => {});
+describe("Login", () => {
+  it("it should 200 for valid credentials", (done) => {
+    chai
+      .request(server)
+      .post("/api/login")
+      .send({ username: "yellowleopard753", password: "jonjon" })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.have.property("token");
+        done();
+      });
+  });
+
+  it("it should return 401 for invalid credentials", (done) => {
+    chai
+      .request(server)
+      .post("/api/login")
+      .send({ username: "fakeUser", password: "abcdef" })
+      .end((err, res) => {
+        res.should.have.status(401);
+        done();
+      });
+  });
+});
 
 describe("Cart", () => {});
