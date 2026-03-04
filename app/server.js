@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+require("dotenv").config({ path: ".env.local" });
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
 const swaggerDocument = YAML.load("./swagger.yaml"); // Replace './swagger.yaml' with the path to your Swagger file
@@ -57,6 +59,45 @@ app.get("/api/products", function (request, response) {
 
   response.writeHead(200, { "Content-Type": "application/json" });
   return response.end(JSON.stringify(products));
+});
+
+app.post("/api/login", function (request, response) {
+  const { username, password } = request.body;
+
+  if (!username || !password) {
+    response.writeHead(404, { "Content-Type": "application/json" });
+    return response.end(
+      JSON.stringify({ message: "Please enter a username and or password." }),
+    );
+  }
+
+  let user = users.find((user) => {
+    return user.login.username === username;
+  });
+
+  if (!user) {
+    response.writeHead(401, { "Content-Type": "application/json" });
+    return response.end(JSON.stringify({ message: "User does not exist." }));
+  }
+
+  const hashedPassword = crypto
+    .createHash("sha256")
+    .update(password + user.login.salt)
+    .digest("hex");
+
+  if (hashedPassword !== user.login.sha256) {
+    response.writeHead(401, { "Content-Type": "application/json" });
+    return response.end();
+  }
+
+  if (user) {
+    response.writeHead(200, { "Content-Type": "application/json" });
+
+    const token = jwt.sign({ username: username }, process.env.SECRET_KEY, {
+      expiresIn: "1h",
+    });
+    response.end(JSON.stringify({ token }));
+  }
 });
 
 // Starting the server
