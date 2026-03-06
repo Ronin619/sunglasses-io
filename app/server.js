@@ -102,7 +102,6 @@ app.post("/api/login", function (request, response) {
 
 app.get("/api/me/cart", function (request, response) {
   const authHeader = request.headers.authorization;
-
   if (!authHeader) {
     response.writeHead(401);
     return response.end("No token provided");

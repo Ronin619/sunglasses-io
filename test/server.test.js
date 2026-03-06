@@ -91,4 +91,28 @@ describe("/POST Login", () => {
   });
 });
 
-describe("Cart", () => {});
+describe("Cart", () => {
+  it("it should return the users cart", (done) => {
+    chai
+      .request(server)
+      .get("/api/me/cart")
+      .set(
+        "Authorization",
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InllbGxvd2xlb3BhcmQ3NTMiLCJpYXQiOjE3NzI3NjE0ODgsImV4cCI6MTc3Mjc2NTA4OH0.1QcA6Qmb8u0_U7HaawlEtcL9dbn5KapmTc_HnvhxqRc",
+      )
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an("array");
+        done();
+      });
+  });
+  it("it should return 401 if no token is sent", (done) => {
+    chai
+      .request(server)
+      .get("/api/me/cart")
+      .end((err, res) => {
+        res.should.have.status(401);
+        done();
+      });
+  });
+});
