@@ -144,3 +144,41 @@ paths:
         401:
           description: >
             If the user credentials cannot be verified, return a 401 error.
+  /me/cart:
+    get:
+      summary: cart
+      description: >
+        The me/cart endpoint returns the user's cart.
+      tags:
+        - cart
+      headers:
+        - name: Authorization
+          in: headers
+          description: bearer token
+          required: true
+          type: string
+      response:
+        200:
+          description: >
+            If a jwt token is valid, return the user's cart.
+          schema:
+            type: array
+            items:
+              type: object
+              required:
+                - id
+                - brand
+                - productName
+                - quantity
+              properties:
+                id:
+                  type: string
+                brand:
+                  type: string
+                productName:
+                  type: string
+                quantity:
+                  type: integer
+        401:
+          description: >
+            If no jwt token was found in the headers, return 401.
