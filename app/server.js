@@ -24,7 +24,20 @@ app.use((err, req, res, next) => {
 // Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// End points
+// token validator helper function
+
+const tokenValidator = (authHeader) => {
+  const token = authHeader.split(" ")[1];
+
+  const verify = jwt.verify(token, process.env.SECRET_KEY);
+  const username = verify.username;
+  const user = users.find((user) => user.login.username === username);
+
+  return user;
+};
+
+// End Points
+
 app.get("/api/brands", function (request, response) {
   if (!brands) {
     response.writeHead(404);
@@ -102,17 +115,14 @@ app.post("/api/login", function (request, response) {
 
 app.get("/api/me/cart", function (request, response) {
   const authHeader = request.headers.authorization;
+
   if (!authHeader) {
     response.writeHead(401);
     return response.end("No token provided");
   }
 
-  const token = authHeader.split(" ")[1];
-
   try {
-    const verify = jwt.verify(token, process.env.SECRET_KEY);
-    const username = verify.username;
-    const user = users.find((user) => user.login.username === username);
+    const user = tokenValidator(authHeader);
 
     response.writeHead(200, { "Content-Type": "application/json" });
     response.end(JSON.stringify(user.cart));
