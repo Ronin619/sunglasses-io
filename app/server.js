@@ -100,6 +100,29 @@ app.post("/api/login", function (request, response) {
   }
 });
 
+app.get("/api/me/cart", function (request, response) {
+  const authHeader = request.headers.authorization;
+
+  if (!authHeader) {
+    response.writeHead(401);
+    return response.end("No token provided");
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const verify = jwt.verify(token, process.env.SECRET_KEY);
+    const username = verify.username;
+    const user = users.find((user) => user.login.username === username);
+
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(JSON.stringify(user.cart));
+  } catch (err) {
+    response.writeHead(401);
+    response.end("Invalid or expired token");
+  }
+});
+
 // Starting the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
