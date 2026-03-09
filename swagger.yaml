@@ -182,3 +182,41 @@ paths:
         401:
           description: >
             If no jwt token was found in the headers, return 401.
+    post:
+      summary: cart
+      tags:
+        - cart
+      headers:
+        - name: Authorization
+          in: headers
+          description: bearer token
+          required: true
+          type: string
+      parameters:
+        - name: id
+          in: path
+          description: The id of the product being added to the cart.
+          required: true
+          type: string
+      responses:
+        200:
+          description: >
+            If a jwt token is valid, add a item to the user's cart.
+          schema:
+            type: array
+            items:
+              type: object
+              required:
+                - id
+                - brandName
+                - description
+                - quantity
+              properties:
+                id:
+                  type: string
+                brandName:
+                  type: string
+                description:
+                  type: string
+                quantity:
+                  type: integer
