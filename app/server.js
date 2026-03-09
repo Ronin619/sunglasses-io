@@ -117,8 +117,8 @@ app.get("/api/me/cart", function (request, response) {
   const authHeader = request.headers.authorization;
 
   if (!authHeader) {
-    response.writeHead(401);
-    return response.end("No token provided");
+    response.writeHead(401, { "Content-Type": "application/json" });
+    return response.end(JSON.stringify({ error: "No token provided" }));
   }
 
   try {
@@ -127,8 +127,55 @@ app.get("/api/me/cart", function (request, response) {
     response.writeHead(200, { "Content-Type": "application/json" });
     response.end(JSON.stringify(user.cart));
   } catch (err) {
-    response.writeHead(401);
-    response.end("Invalid or expired token");
+    response.writeHead(401, { "Content-Type": "application/json" });
+    response.end(JSON.stringify({ error: "Invalid or expired token" }));
+  }
+});
+
+app.post("/api/me/cart", function (request, response) {
+  const authHeader = request.headers.authorization;
+
+  if (!authHeader) {
+    response.writeHead(401, { "Content-Type": "application/json" });
+    return response.end(JSON.stringify({ error: "No token provided" }));
+  }
+
+  try {
+    const user = tokenValidator(authHeader);
+    const { id } = request.body;
+    const product = products.find((product) => product.id === id);
+
+    if (!product) {
+      response.writeHead(404, { "Content-Type": "application/json" });
+      return response.end(JSON.stringify({ error: "No product found." }));
+    }
+
+    const brand = brands.find((item) => item.id === product.categoryId);
+
+    if (!brand) {
+      response.writeHead(404, { "Content-Type": "application/json" });
+      return response.end(JSON.stringify({ error: "No brand found." }));
+    }
+
+    const cartItem = {
+      id: product.id,
+      brandName: brand.name,
+      color: product.name,
+      quantity: 1,
+    };
+    const cart = user.cart;
+    const foundItem = cart.find((item) => item.id === cartItem.id);
+
+    if (foundItem) {
+      foundItem.quantity += 1;
+    } else {
+      cart.push(cartItem);
+    }
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(JSON.stringify(user.cart));
+  } catch (err) {
+    response.writeHead(401, { "Content-Type": "application/json" });
+    response.end(JSON.stringify({ error: "Invalid or expired token" }));
   }
 });
 
