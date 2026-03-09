@@ -98,7 +98,7 @@ describe("Cart", () => {
       .get("/api/me/cart")
       .set(
         "Authorization",
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InllbGxvd2xlb3BhcmQ3NTMiLCJpYXQiOjE3NzI3NjE0ODgsImV4cCI6MTc3Mjc2NTA4OH0.1QcA6Qmb8u0_U7HaawlEtcL9dbn5KapmTc_HnvhxqRc",
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InllbGxvd2xlb3BhcmQ3NTMiLCJpYXQiOjE3NzMwODY2ODMsImV4cCI6MTc3MzA5MDI4M30.KqxvrpQpai6mTXWd6aZ8fnSnxVsy1zscNoG9P88COFU",
       )
       .end((err, res) => {
         res.should.have.status(200);
@@ -106,12 +106,29 @@ describe("Cart", () => {
         done();
       });
   });
+
   it("it should return 401 if no token is sent", (done) => {
     chai
       .request(server)
       .get("/api/me/cart")
       .end((err, res) => {
         res.should.have.status(401);
+        done();
+      });
+  });
+
+  it("it should add a product to the user's cart", (done) => {
+    chai
+      .request(server)
+      .post("/api/me/cart")
+      .set(
+        "Authorization",
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InllbGxvd2xlb3BhcmQ3NTMiLCJpYXQiOjE3NzMwODY2ODMsImV4cCI6MTc3MzA5MDI4M30.KqxvrpQpai6mTXWd6aZ8fnSnxVsy1zscNoG9P88COFU",
+      )
+      .send({ id: "1" })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an("array");
         done();
       });
   });
