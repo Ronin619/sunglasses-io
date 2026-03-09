@@ -160,7 +160,7 @@ app.post("/api/me/cart", function (request, response) {
     const cartItem = {
       id: product.id,
       brandName: brand.name,
-      color: product.name,
+      desciption: product.name,
       quantity: 1,
     };
     const cart = user.cart;
