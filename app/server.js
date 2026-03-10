@@ -179,6 +179,35 @@ app.post("/api/me/cart", function (request, response) {
   }
 });
 
+app.delete("/api/me/cart/:productId", function (request, response) {
+  const authHeader = request.headers.authorization;
+
+  if (!authHeader) {
+    response.writeHead(401, { "Content-Type": "application/json" });
+    return response.end(JSON.stringify({ error: "No token provided" }));
+  }
+
+  try {
+    const user = tokenValidator(authHeader);
+    let cart = user.cart;
+    const { productId } = request.params;
+    const deleteIndex = cart.findIndex((product) => product.id === productId);
+
+    if (deleteIndex === -1) {
+      response.writeHead(404, { "Content-Type": "application/json" });
+      return response.end(JSON.stringify({ error: "Product not in cart" }));
+    }
+
+    cart.splice(index, 1);
+
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.end(JSON.stringify(cart));
+  } catch (err) {
+    response.writeHead(401, { "Content-Type": "application/json" });
+    response.end(JSON.stringify({ error: "Invalid or expired token" }));
+  }
+});
+
 // Starting the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
