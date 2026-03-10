@@ -5,21 +5,19 @@ info:
   description: "API for managing brands, products, and user cart"
 
 host: "localhost:3000"
-schemes:
-  - "http"
-
 basePath: "/api"
 
+schemes:
+  - http
+
 produces:
-  - "application/json"
+  - application/json
 
 paths:
   /brands:
     get:
       summary: Brands
-      description: >
-        The brands endpoint returns all brands of sunglasses.
-        The response will include the id and name of each sunglass brand.
+      description: Returns all sunglass brands.
       tags:
         - brands
       responses:
@@ -41,17 +39,15 @@ paths:
   /brands/{id}/products:
     get:
       summary: Products
-      description: >
-        The products by brand id endpoint returns all products
-        that match the brand id parameter.
+      description: Returns products that match the brand id.
       tags:
         - products
       parameters:
         - name: id
           in: path
-          description: The id of the brand to accept
           required: true
           type: string
+          description: Brand id
       responses:
         200:
           description: An array of products
@@ -81,12 +77,16 @@ paths:
                   items:
                     type: string
         404:
-          description: No products with matching brand id exist.
+          description: No products with matching brand id exist
+
   /products:
     get:
+      summary: Products
+      tags:
+        - products
       responses:
         200:
-          description: An array of products.
+          description: An array of products
           schema:
             type: array
             items:
@@ -113,95 +113,49 @@ paths:
                   items:
                     type: string
         404:
-          description: No products available.
+          description: No products available
+
   /login:
     post:
-      summary: login
-      description: >
-        The login endpoint checks if user credentials exist in the user database and generates a jwt web token.
+      summary: Login
+      description: Verifies credentials and returns a JWT token.
       tags:
         - login
       parameters:
         - name: username
           in: query
-          description: The username
           required: true
           type: string
         - name: password
           in: query
-          description: user password
           required: true
           type: string
-      response:
+      responses:
         200:
-          description: >
-            If a user credential is verified, a jwt web token is returned to the client.
+          description: JWT token returned
           schema:
             type: object
             properties:
               token:
                 type: string
         401:
-          description: >
-            If the user credentials cannot be verified, return a 401 error.
+          description: Invalid credentials
+
   /me/cart:
     get:
-      summary: cart
-      description: >
-        The me/cart endpoint returns the user's cart.
+      summary: Get cart
+      description: Returns the user's cart.
       tags:
         - cart
-      headers:
-        - name: Authorization
-          in: headers
-          description: bearer token
-          required: true
-          type: string
-      response:
-        200:
-          description: >
-            If a jwt token is valid, return the user's cart.
-          schema:
-            type: array
-            items:
-              type: object
-              required:
-                - id
-                - brand
-                - productName
-                - quantity
-              properties:
-                id:
-                  type: string
-                brand:
-                  type: string
-                productName:
-                  type: string
-                quantity:
-                  type: integer
-        401:
-          description: >
-            If no jwt token was found in the headers, return 401.
-    post:
-      summary: cart
-      tags:
-        - cart
-      headers:
-        - name: Authorization
-          in: headers
-          description: bearer token
-          required: true
-          type: string
       parameters:
-        - name: id
-          in: path
-          description: The id of the product being added to the cart.
+        - name: Authorization
+          in: header
           required: true
           type: string
+          description: Bearer token
       responses:
         200:
-          description: >
-            If a jwt token is valid, add a item to the user's cart.
+          description: User cart
           schema:
             type: array
             items:
@@ -220,3 +174,77 @@ paths:
                   type: string
                 quantity:
                   type: integer
+        401:
+          description: No token provided
+
+    post:
+      summary: Add item to cart
+      tags:
+        - cart
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+        - name: product
+          in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                type: string
+      responses:
+        200:
+          description: Updated cart
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                brandName:
+                  type: string
+                description:
+                  type: string
+                quantity:
+                  type: integer
+
+  /me/cart/{productId}:
+    delete:
+      summary: Delete cart item
+      description: Removes a product from the cart.
+      tags:
+        - cart
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+        - name: productId
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Updated cart
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                brandName:
+                  type: string
+                description:
+                  type: string
+                quantity:
+                  type: integer
+        404:
+          description: Product not found
+        401:
+          description: Invalid or missing token
