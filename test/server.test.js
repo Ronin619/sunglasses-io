@@ -168,4 +168,62 @@ describe("Cart", () => {
         done();
       });
   });
+
+  it("it should update the quantity of an item in the user's cart", (done) => {
+    chai
+      .request(server)
+      .post("/api/me/cart")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ id: "1" })
+      .end(() => {
+        chai
+          .request(server)
+          .post("/api/me/cart/1")
+          .set("Authorization", `Bearer ${token}`)
+          .send({ quantity: 6 })
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.be.an("array");
+            done();
+          });
+      });
+  });
+
+  it("it should return 404 if the product does not exist", (done) => {
+    chai
+      .request(server)
+      .post("/api/me/cart")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ id: "1" })
+      .end(() => {
+        chai
+          .request(server)
+          .post("/api/me/cart/2")
+          .set("Authorization", `Bearer ${token}`)
+          .send({ quantity: 0 })
+          .end((err, res) => {
+            res.should.have.status(404);
+            done();
+          });
+      });
+  });
+
+  it("it should return 404 if the quantity is less than 1", (done) => {
+    chai
+      .request(server)
+      .post("/api/me/cart")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ id: "1" })
+      .end(() => {
+        chai
+          .request(server)
+          .post("/api/me/cart/1")
+          .set("Authorization", `Bearer ${token}`)
+          .send({ quantity: 0 })
+          .end((err, res) => {
+            res.should.have.status(404);
+            done();
+          });
+      });
+  });
 });
