@@ -92,14 +92,30 @@ describe("/POST Login", () => {
 });
 
 describe("Cart", () => {
+  let token;
+
+  before((done) => {
+    chai
+      .request(server)
+      .post("/api/login")
+      .send({
+        username: "yellowleopard753",
+        password: "jonjon",
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.have.property("token");
+        token = res.body.token;
+        token.should.be.a("string");
+        done();
+      });
+  });
+
   it("it should return the users cart", (done) => {
     chai
       .request(server)
       .get("/api/me/cart")
-      .set(
-        "Authorization",
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InllbGxvd2xlb3BhcmQ3NTMiLCJpYXQiOjE3NzMwODY2ODMsImV4cCI6MTc3MzA5MDI4M30.KqxvrpQpai6mTXWd6aZ8fnSnxVsy1zscNoG9P88COFU",
-      )
+      .set("Authorization", `Bearer ${token}`)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an("array");
@@ -121,14 +137,34 @@ describe("Cart", () => {
     chai
       .request(server)
       .post("/api/me/cart")
-      .set(
-        "Authorization",
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InllbGxvd2xlb3BhcmQ3NTMiLCJpYXQiOjE3NzMwODY2ODMsImV4cCI6MTc3MzA5MDI4M30.KqxvrpQpai6mTXWd6aZ8fnSnxVsy1zscNoG9P88COFU",
-      )
+      .set("Authorization", `Bearer ${token}`)
       .send({ id: "1" })
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an("array");
+        done();
+      });
+  });
+
+  it("it should delete a product from the user's cart", (done) => {
+    chai
+      .request(server)
+      .delete("/api/me/cart/1")
+      .set("Authorization", `Bearer ${token}`)
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an("array");
+        done();
+      });
+  });
+
+  it("it should return 404 when a product set for deletion doesn't exist in the user's cart", (done) => {
+    chai
+      .request(server)
+      .delete("/api/me/cart/0")
+      .set("Authorization", `Bearer ${token}`)
+      .end((err, res) => {
+        res.should.have.status(404);
         done();
       });
   });
