@@ -198,11 +198,12 @@ app.delete("/api/me/cart/:productId", function (request, response) {
       return response.end(JSON.stringify({ error: "Product not in cart" }));
     }
 
-    cart.splice(index, 1);
+    cart.splice(deleteIndex, 1);
 
     response.writeHead(200, { "Content-Type": "application/json" });
     response.end(JSON.stringify(cart));
   } catch (err) {
+    console.log(err);
     response.writeHead(401, { "Content-Type": "application/json" });
     response.end(JSON.stringify({ error: "Invalid or expired token" }));
   }
